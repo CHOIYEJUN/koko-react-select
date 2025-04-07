@@ -23,6 +23,6 @@
 ## 📦 설치하기
 
 ```bash
-npm install vonly-react-select
+npm install koko-react-select
 # 또는
-pnpm add vonly-react-select
+pnpm add koko-react-select
