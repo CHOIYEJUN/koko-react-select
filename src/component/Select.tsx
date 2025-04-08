@@ -11,13 +11,10 @@ import {
   selectPlaceholderContainer,
 } from './Select.css';
 import useOutsideClick from './hooks/useOutsideClick.ts';
+import { OptionType } from './type/commonType.ts';
 import { isEmpty } from './utils/commonUtils.ts';
-import { useRef, useState, MouseEvent } from 'react';
-
-type OptionType = {
-  label: string;
-  value: string | number;
-};
+import { filterOptions } from './utils/searchUtils.ts';
+import { useRef, useState, MouseEvent, useMemo } from 'react';
 
 interface SelectProps {
   isSearchable?: boolean;
@@ -50,6 +47,10 @@ const Select = (props: SelectProps) => {
 
   const selectContainerRef = useRef<HTMLDivElement>(null);
   const selectRef = useRef<HTMLInputElement>(null);
+
+  const filteredOptionList = useMemo(() => {
+    return filterOptions(optionList, source);
+  }, [optionList, source]);
 
   const onReset = () => {
     setIsOpen(false);
@@ -91,9 +92,8 @@ const Select = (props: SelectProps) => {
   };
 
   const handleToggleDropdown = () => {
-    console.log('[handleToggleDropdown]');
-
     if (disabled) return;
+
     if (isOpen) {
       setIsOpen(false);
     } else {
@@ -101,6 +101,9 @@ const Select = (props: SelectProps) => {
     }
   };
 
+  //TODO isSearchable false 일때 input 입력 안되게 하기
+
+  //TODO 검색 이상한거 고치기
   return (
     <div style={{ position: 'relative' }} ref={selectContainerRef}>
       <div
@@ -118,17 +121,15 @@ const Select = (props: SelectProps) => {
             </div>
           </div>
 
-          {isSearchable && (
-            <input
-              className={selectInput}
-              ref={selectRef}
-              value={source}
-              onFocus={handleInputFocus}
-              onChange={(event) => handleInputChange(event.target.value)}
-              onClick={handleInputClick}
-              disabled={disabled}
-            />
-          )}
+          <input
+            className={selectInput}
+            ref={selectRef}
+            value={source}
+            onFocus={handleInputFocus}
+            onChange={(event) => handleInputChange(event.target.value)}
+            onClick={handleInputClick}
+            disabled={disabled}
+          />
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -154,7 +155,7 @@ const Select = (props: SelectProps) => {
           {optionList.length === 0 ? (
             <div className={selectOption}>No Data</div>
           ) : (
-            optionList.map((option) => (
+            filteredOptionList.map((option) => (
               <div key={option.value} className={selectOption} onClick={() => handleOptionClick(option)}>
                 {option.label}
               </div>
