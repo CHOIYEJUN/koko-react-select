@@ -1,142 +1,169 @@
-import styles from './Select.module.css';
-
+import ArrowIcon from '../assets/icon/icon_arrow.svg?react';
 import ClearIcon from '../assets/icon/icon_clear.svg?react';
 import SearchIcon from '../assets/icon/icon_search.svg?react';
-import ArrowIcon from '../assets/icon/icon_arrow.svg?react';
-import {useEffect, useRef, useState} from "react";
-import useOutsideClick from "./useOutsideClick.ts";
+import {
+  selectContainer,
+  selectInput,
+  selectInputContainer,
+  selectOption,
+  selectOptionContainer,
+  selectPlaceholder,
+  selectPlaceholderContainer,
+} from './Select.css';
+import useOutsideClick from './useOutsideClick';
+import { isEmpty } from './utils.ts';
+import { useRef, useState, MouseEvent } from 'react';
 
 type OptionType = {
-    label : string, value : string | number
+  label: string;
+  value: string | number;
+};
+
+interface SelectProps {
+  isSearchable?: boolean;
+  isClearable?: boolean;
+  disabled?: boolean;
+  invalid?: boolean;
+  value: string | number;
+  optionList: OptionType[];
+  placeholder?: string;
+  onChange?: (value: string | number | null) => void;
+  maxHeight?: string;
 }
 
-interface selectProps {
-    isSearchable : boolean;
-    isClearable : boolean;
-    disabled : boolean;
-    value : string | number;
-    optionList : OptionType[];
-    placeholder : string;
-    onChange?: (value: string | number | null) => void;
-    maxHeight? : string;
-}
+const Select = (props: SelectProps) => {
+  const {
+    isSearchable = false,
+    isClearable = true,
+    disabled = false,
+    invalid = false,
+    value,
+    optionList = [],
+    placeholder,
+    onChange,
+    maxHeight = '200px',
+  } = props;
 
-const Select = (props : selectProps) => {
+  const [selectedOption, setSelectedOption] = useState<OptionType>();
+  const [isOpen, setIsOpen] = useState(false);
+  const [source, setSource] = useState('');
 
-    const {isSearchable, isClearable, disabled, value, optionList =[], placeholder,  onChange,maxHeight = '200px'} = props
+  const selectContainerRef = useRef<HTMLDivElement>(null);
+  const selectRef = useRef<HTMLInputElement>(null);
 
-    const [selectedOption, setSelectedOption] = useState<OptionType>()
+  const onReset = () => {
+    setIsOpen(false);
+    setSource('');
+  };
 
-    const [isOpen, setIsOpen] = useState(false);
+  useOutsideClick({
+    ref: selectContainerRef,
+    callback: onReset,
+  });
 
-    const selectContainerRef = useRef<HTMLDivElement>(null);
-    const selectRef = useRef<HTMLInputElement>(null);
-    const [source, setSource] = useState<string>('');
+  const handleInputFocus = () => {
+    setIsOpen(!isOpen);
+  };
 
+  const handleInputClick = (event: MouseEvent) => {
+    event.stopPropagation();
+    setSource('');
+  };
 
-    useOutsideClick({
-        ref: selectContainerRef,
-        callback: () => setIsOpen(false),
-    });
+  const handleInputChange = (value: string) => {
+    setSource(value);
+  };
 
-    const handleInputFocus = () => {
-        setIsOpen(true); // ✅ 무조건 열기
-        setSource('');
-    };
+  const handleOptionClick = (option: OptionType) => {
+    onChange?.(option.value);
+    setSelectedOption(option);
+    setIsOpen(false);
+    setSource('');
+  };
 
-    const handleInputClick = () => {
-        setSource(''); // 검색어 초기화
-    };
+  const handleClear = (event: MouseEvent) => {
+    event.stopPropagation();
 
-    const handleInputChange = (value: string) => {
-        setSource(value);
-    };
+    onChange?.(null);
+    setIsOpen(false);
+    setSource('');
+    setSelectedOption(null);
+  };
 
-    const handleOptionClick = (option: OptionType) => {
-        onChange?.(option.value);
-        setSelectedOption(option);
-        setIsOpen(false);
-        setSource('');
-    };
+  const handleToggleDropdown = () => {
+    console.log('[handleToggleDropdown]');
 
-    const handleClear = () => {
-        onChange?.(null);
-        setIsOpen(false);
-        setSource('');
-    };
+    if (disabled) return;
+    if (isOpen) {
+      setIsOpen(false);
+    } else {
+      selectRef.current?.focus();
+    }
+  };
 
-    const handleToggleDropdown = () => {
-        if (disabled) return;
-
-        if (isOpen) {
-            setIsOpen(false);
-        } else {
-            selectRef.current?.focus();
-        }
-    };
-
-    useEffect(() => {
-        console.log('isOpen 상태 변경됨:', isOpen);
-    }, [isOpen]);
-
-    return (
-        <div style={{position: 'relative', width: '300px'}} ref={selectContainerRef}>
-            <div
-                className={`${styles.selectContainer} ${isOpen ? styles.active : ''}`}
-                onClick={handleToggleDropdown}
-            >
-                {/* Input 영역 */}
-                <div className={styles.selectInputContainer}>
-                    <div className={styles.selectPlaceholderContainer}>
-                        <div className={styles.selectPlaceholder}>
-                            {!source && (selectedOption?.label || placeholder || 'Select...')}
-                        </div>
-                    </div>
-                    <input
-                        className={styles.selectInput}
-                        ref={selectRef}
-                        value={source}
-                        onFocus={handleInputFocus}
-                        onChange={(event) => handleInputChange(event.target.value)}
-                        onClick={handleInputClick}
-                    />
-                </div>
-
-                {/* 아이콘 영역 */}
-                <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-                    {isClearable && value && !disabled && (
-                        <ClearIcon
-                            width={20}
-                            height={20}
-                            stroke={'#5C7099'}
-                            style={{cursor: 'pointer'}}
-                            onClick={handleClear}
-                        />
-                    )}
-                    {isSearchable && (
-                        <SearchIcon width={20} height={20} style={{cursor: 'pointer', stroke: '#5C7099'}}/>
-                    )}
-                    <ArrowIcon width={20} height={20} style={{cursor: 'pointer', stroke: '#5C7099', fill: '#5C7099'}}/>
-                </div>
+  return (
+    <div style={{ position: 'relative' }} ref={selectContainerRef}>
+      <div
+        className={selectContainer({
+          isOpen,
+          disabled,
+        })}
+        onClick={handleToggleDropdown}
+        style={{ width: '300px' }}
+      >
+        <div className={selectInputContainer}>
+          <div className={selectPlaceholderContainer}>
+            <div className={selectPlaceholder({ isLabel: !isEmpty(selectedOption?.label) })}>
+              {!source && (selectedOption?.label || placeholder || 'Select...')}
             </div>
+          </div>
 
-            {/* 옵션 리스트 */}
-            {isOpen && (
-                <div className={styles.selectOptionContainer}  style={{ minWidth: selectContainerRef.current?.offsetWidth , maxHeight : maxHeight }}>
-                    {optionList?.length === 0 ? (
-                        <div className={styles.selectOption}>No Data</div>
-                    ) : (
-                        optionList?.map((option) => (
-                            <div key={option.value} className={styles.selectOption} onClick={() => handleOptionClick(option)}>
-                                {option.label}
-                            </div>
-                        ))
-                    )}
-                </div>
-            )}
+          {isSearchable && (
+            <input
+              className={selectInput}
+              ref={selectRef}
+              value={source}
+              onFocus={handleInputFocus}
+              onChange={(event) => handleInputChange(event.target.value)}
+              onClick={handleInputClick}
+              disabled={disabled}
+            />
+          )}
         </div>
-    )
 
-}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {isClearable && value && !disabled && (
+            <ClearIcon width={20} height={20} stroke={'#5C7099'} style={{ cursor: 'pointer' }} onClick={handleClear} />
+          )}
+          {isSearchable ? (
+            <SearchIcon width={20} height={20} style={{ cursor: 'pointer', stroke: '#5C7099' }} />
+          ) : (
+            <ArrowIcon width={20} height={20} style={{ cursor: 'pointer', stroke: '#5C7099', fill: '#5C7099' }} />
+          )}
+        </div>
+      </div>
 
-export default Select
+      {isOpen && (
+        <div
+          className={selectOptionContainer}
+          style={{
+            minWidth: selectContainerRef.current?.offsetWidth,
+            maxHeight: maxHeight,
+          }}
+        >
+          {optionList.length === 0 ? (
+            <div className={selectOption}>No Data</div>
+          ) : (
+            optionList.map((option) => (
+              <div key={option.value} className={selectOption} onClick={() => handleOptionClick(option)}>
+                {option.label}
+              </div>
+            ))
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Select;
