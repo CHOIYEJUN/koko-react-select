@@ -10,8 +10,8 @@ import {
   selectPlaceholder,
   selectPlaceholderContainer,
 } from './Select.css';
-import useOutsideClick from './useOutsideClick';
-import { isEmpty } from './utils.ts';
+import useOutsideClick from './hooks/useOutsideClick.ts';
+import { isEmpty } from './utils/commonUtils.ts';
 import { useRef, useState, MouseEvent } from 'react';
 
 type OptionType = {
