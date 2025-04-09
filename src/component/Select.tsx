@@ -14,7 +14,7 @@ import useOutsideClick from './hooks/useOutsideClick.ts';
 import { OptionType } from './type/commonType.ts';
 import { isEmpty } from './utils/commonUtils.ts';
 import { filterOptions } from './utils/searchUtils.ts';
-import { useRef, useState, MouseEvent, useMemo } from 'react';
+import {useRef, useState, MouseEvent, useMemo, RefObject} from 'react';
 
 interface SelectProps {
   isSearchable?: boolean;
@@ -58,7 +58,7 @@ const Select = (props: SelectProps) => {
   };
 
   useOutsideClick({
-    ref: selectContainerRef,
+    ref: selectContainerRef as RefObject<HTMLElement>,
     callback: onReset,
   });
 
@@ -129,6 +129,7 @@ const Select = (props: SelectProps) => {
             onChange={(event) => handleInputChange(event.target.value)}
             onClick={handleInputClick}
             disabled={disabled}
+            readOnly={!isSearchable}
           />
         </div>
 
