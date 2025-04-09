@@ -101,9 +101,6 @@ const Select = (props: SelectProps) => {
     }
   };
 
-  //TODO isSearchable false 일때 input 입력 안되게 하기
-
-  //TODO 검색 이상한거 고치기
   return (
     <div style={{ position: 'relative' }} ref={selectContainerRef}>
       <div
