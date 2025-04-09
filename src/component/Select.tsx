@@ -41,7 +41,7 @@ const Select = (props: SelectProps) => {
     maxHeight = '200px',
   } = props;
 
-  const [selectedOption, setSelectedOption] = useState<OptionType>();
+  const [selectedOption, setSelectedOption] = useState<OptionType | null>();
   const [isOpen, setIsOpen] = useState(false);
   const [source, setSource] = useState('');
 
