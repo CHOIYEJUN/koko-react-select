@@ -41,7 +41,6 @@ function App() {
         onChange={(value) => setValue2(value || '')}
         placeholder={'...select'}
         optionList={optionList}
-        isClearable={true}
       />
     </div>
   );

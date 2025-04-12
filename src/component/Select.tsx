@@ -1,6 +1,7 @@
 import ArrowIcon from '../assets/icon/icon_arrow.svg?react';
 import ClearIcon from '../assets/icon/icon_clear.svg?react';
 import SearchIcon from '../assets/icon/icon_search.svg?react';
+import useOutsideClick from './hooks/useOutsideClick.ts';
 import {
   selectContainer,
   selectInput,
@@ -9,23 +10,11 @@ import {
   selectOptionContainer,
   selectPlaceholder,
   selectPlaceholderContainer,
-} from './Select.css';
-import useOutsideClick from './hooks/useOutsideClick.ts';
-import { OptionType } from './type/commonType.ts';
+} from './style/Select.css.ts';
+import { CustomClassName, OptionType } from './type/commonType.ts';
 import { isEmpty } from './utils/commonUtils.ts';
 import { filterOptions } from './utils/searchUtils.ts';
 import { useRef, useState, MouseEvent, useMemo, RefObject } from 'react';
-
-type customClassName = {
-  container?: string;
-  inputContainer?: string;
-  placeholderContainer?: string;
-  placeholder?: string;
-  input?: string;
-  iconWrapper?: string;
-  optionContainer?: string;
-  option?: string;
-};
 
 interface SelectProps {
   isSearchable?: boolean;
@@ -37,7 +26,7 @@ interface SelectProps {
   placeholder?: string;
   onChange?: (value: string | number | null) => void;
   maxHeight?: string;
-  customClassName?: customClassName;
+  customClassName?: CustomClassName;
 }
 
 const Select = (props: SelectProps) => {
