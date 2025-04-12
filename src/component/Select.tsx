@@ -14,7 +14,18 @@ import useOutsideClick from './hooks/useOutsideClick.ts';
 import { OptionType } from './type/commonType.ts';
 import { isEmpty } from './utils/commonUtils.ts';
 import { filterOptions } from './utils/searchUtils.ts';
-import {useRef, useState, MouseEvent, useMemo, RefObject} from 'react';
+import { useRef, useState, MouseEvent, useMemo, RefObject } from 'react';
+
+type customClassName = {
+  container?: string;
+  inputContainer?: string;
+  placeholderContainer?: string;
+  placeholder?: string;
+  input?: string;
+  iconWrapper?: string;
+  optionContainer?: string;
+  option?: string;
+};
 
 interface SelectProps {
   isSearchable?: boolean;
@@ -26,6 +37,7 @@ interface SelectProps {
   placeholder?: string;
   onChange?: (value: string | number | null) => void;
   maxHeight?: string;
+  customClassName?: customClassName;
 }
 
 const Select = (props: SelectProps) => {
@@ -39,6 +51,7 @@ const Select = (props: SelectProps) => {
     placeholder,
     onChange,
     maxHeight = '200px',
+    customClassName,
   } = props;
 
   const [selectedOption, setSelectedOption] = useState<OptionType | null>();
@@ -104,22 +117,21 @@ const Select = (props: SelectProps) => {
   return (
     <div style={{ position: 'relative' }} ref={selectContainerRef}>
       <div
-        className={selectContainer({
-          isOpen,
-          disabled,
-        })}
+        className={`${selectContainer({ isOpen, disabled, invalid })} ${customClassName?.container || ''}`}
         onClick={handleToggleDropdown}
         style={{ width: '300px' }}
       >
-        <div className={selectInputContainer}>
-          <div className={selectPlaceholderContainer}>
-            <div className={selectPlaceholder({ isLabel: !isEmpty(selectedOption?.label) })}>
+        <div className={`${selectInputContainer} ${customClassName?.inputContainer || ''}`}>
+          <div className={`${selectPlaceholderContainer} ${customClassName?.placeholderContainer || ''}`}>
+            <div
+              className={`${selectPlaceholder({ isLabel: !isEmpty(selectedOption?.label) })} ${customClassName?.placeholder || ''}`}
+            >
               {!source && (selectedOption?.label || placeholder || 'Select...')}
             </div>
           </div>
 
           <input
-            className={selectInput}
+            className={`${selectInput} ${customClassName?.input || ''}`}
             ref={selectRef}
             value={source}
             onFocus={handleInputFocus}
@@ -130,7 +142,10 @@ const Select = (props: SelectProps) => {
           />
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div
+          style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+          className={customClassName?.iconWrapper || ''}
+        >
           {isClearable && value && !disabled && (
             <ClearIcon width={20} height={20} stroke={'#5C7099'} style={{ cursor: 'pointer' }} onClick={handleClear} />
           )}
@@ -144,17 +159,21 @@ const Select = (props: SelectProps) => {
 
       {isOpen && (
         <div
-          className={selectOptionContainer}
+          className={`${selectOptionContainer} ${customClassName?.optionContainer || ''}`}
           style={{
             minWidth: selectContainerRef.current?.offsetWidth,
             maxHeight: maxHeight,
           }}
         >
           {optionList.length === 0 ? (
-            <div className={selectOption}>No Data</div>
+            <div className={`${selectOption} ${customClassName?.option || ''}`}>No Data</div>
           ) : (
             filteredOptionList.map((option) => (
-              <div key={option.value} className={selectOption} onClick={() => handleOptionClick(option)}>
+              <div
+                key={option.value}
+                className={`${selectOption} ${customClassName?.option || ''}`}
+                onClick={() => handleOptionClick(option)}
+              >
                 {option.label}
               </div>
             ))
