@@ -10,14 +10,11 @@ import {
   selectPlaceholder,
   selectPlaceholderContainer,
 } from './Select.css';
-import useOutsideClick from './useOutsideClick';
-import { isEmpty } from './utils.ts';
-import { useRef, useState, MouseEvent } from 'react';
-
-type OptionType = {
-  label: string;
-  value: string | number;
-};
+import useOutsideClick from './hooks/useOutsideClick.ts';
+import { OptionType } from './type/commonType.ts';
+import { isEmpty } from './utils/commonUtils.ts';
+import { filterOptions } from './utils/searchUtils.ts';
+import {useRef, useState, MouseEvent, useMemo, RefObject} from 'react';
 
 interface SelectProps {
   isSearchable?: boolean;
@@ -44,12 +41,16 @@ const Select = (props: SelectProps) => {
     maxHeight = '200px',
   } = props;
 
-  const [selectedOption, setSelectedOption] = useState<OptionType>();
+  const [selectedOption, setSelectedOption] = useState<OptionType | null>();
   const [isOpen, setIsOpen] = useState(false);
   const [source, setSource] = useState('');
 
   const selectContainerRef = useRef<HTMLDivElement>(null);
   const selectRef = useRef<HTMLInputElement>(null);
+
+  const filteredOptionList = useMemo(() => {
+    return filterOptions(optionList, source);
+  }, [optionList, source]);
 
   const onReset = () => {
     setIsOpen(false);
@@ -57,7 +58,7 @@ const Select = (props: SelectProps) => {
   };
 
   useOutsideClick({
-    ref: selectContainerRef,
+    ref: selectContainerRef as RefObject<HTMLElement>,
     callback: onReset,
   });
 
@@ -91,9 +92,8 @@ const Select = (props: SelectProps) => {
   };
 
   const handleToggleDropdown = () => {
-    console.log('[handleToggleDropdown]');
-
     if (disabled) return;
+
     if (isOpen) {
       setIsOpen(false);
     } else {
@@ -118,17 +118,16 @@ const Select = (props: SelectProps) => {
             </div>
           </div>
 
-          {isSearchable && (
-            <input
-              className={selectInput}
-              ref={selectRef}
-              value={source}
-              onFocus={handleInputFocus}
-              onChange={(event) => handleInputChange(event.target.value)}
-              onClick={handleInputClick}
-              disabled={disabled}
-            />
-          )}
+          <input
+            className={selectInput}
+            ref={selectRef}
+            value={source}
+            onFocus={handleInputFocus}
+            onChange={(event) => handleInputChange(event.target.value)}
+            onClick={handleInputClick}
+            disabled={disabled}
+            readOnly={!isSearchable}
+          />
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -154,7 +153,7 @@ const Select = (props: SelectProps) => {
           {optionList.length === 0 ? (
             <div className={selectOption}>No Data</div>
           ) : (
-            optionList.map((option) => (
+            filteredOptionList.map((option) => (
               <div key={option.value} className={selectOption} onClick={() => handleOptionClick(option)}>
                 {option.label}
               </div>
