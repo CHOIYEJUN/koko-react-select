@@ -32,6 +32,12 @@ export const selectContainer = recipe({
       },
       false: {},
     },
+    invalid: {
+      true: {
+        border: `1px solid ${vars.color.danger}`,
+      },
+      false: {},
+    },
   },
   defaultVariants: {
     isOpen: false,
