@@ -12,27 +12,39 @@ import {
   selectPlaceholderContainer,
 } from './style/Select.css.ts';
 import { CustomClassName, OptionType } from './type/commonType.ts';
-import { isEmpty } from './utils/commonUtils.ts';
 import { filterOptions } from './utils/searchUtils.ts';
 import { useRef, useState, MouseEvent, useMemo, RefObject } from 'react';
 
-interface SelectProps {
+type CommonSelectProps<T extends string | number> = {
+  optionList: OptionType<T>[];
+  placeholder?: string;
   isSearchable?: boolean;
   isClearable?: boolean;
   disabled?: boolean;
   invalid?: boolean;
-  value: string | number;
-  optionList: OptionType[];
-  placeholder?: string;
-  onChange?: (value: string | number | null) => void;
   maxHeight?: string;
   customClassName?: CustomClassName;
-}
+};
 
-const Select = (props: SelectProps) => {
+type SingleSelectProps<T extends string | number> = CommonSelectProps<T> & {
+  isMulti?: false;
+  value: T | null;
+  onChange: (value: T | null) => void;
+};
+
+type MultiSelectProps<T extends string | number> = CommonSelectProps<T> & {
+  isMulti: true;
+  value: T[];
+  onChange: (value: T[]) => void;
+};
+
+type SelectProps<T extends string | number> = SingleSelectProps<T> | MultiSelectProps<T>;
+
+const Select = <T extends string | number>(props: SelectProps<T>) => {
   const {
     isSearchable = false,
     isClearable = true,
+    isMulti = false,
     disabled = false,
     invalid = false,
     value,
@@ -43,12 +55,20 @@ const Select = (props: SelectProps) => {
     customClassName,
   } = props;
 
-  const [selectedOption, setSelectedOption] = useState<OptionType | null>();
   const [isOpen, setIsOpen] = useState(false);
   const [source, setSource] = useState('');
 
   const selectContainerRef = useRef<HTMLDivElement>(null);
   const selectRef = useRef<HTMLInputElement>(null);
+
+  const selectedValues: T[] = useMemo(() => {
+    if (isMulti) return (value as T[]) ?? [];
+    return value !== null && value !== undefined ? [value as T] : [];
+  }, [value, isMulti]);
+
+  const selectedList = useMemo(() => {
+    return optionList.filter((opt) => selectedValues.includes(opt.value));
+  }, [selectedValues, optionList]);
 
   const filteredOptionList = useMemo(() => {
     return filterOptions(optionList, source);
@@ -64,9 +84,7 @@ const Select = (props: SelectProps) => {
     callback: onReset,
   });
 
-  const handleInputFocus = () => {
-    setIsOpen(!isOpen);
-  };
+  const handleInputFocus = () => setIsOpen(true);
 
   const handleInputClick = (event: MouseEvent) => {
     event.stopPropagation();
@@ -77,25 +95,41 @@ const Select = (props: SelectProps) => {
     setSource(value);
   };
 
-  const handleOptionClick = (option: OptionType) => {
-    onChange?.(option.value);
-    setSelectedOption(option);
-    setIsOpen(false);
+  const handleOptionClick = (option: OptionType<T>) => {
+    if (isMulti) {
+      const prev = value as T[];
+      const isSelected = prev.includes(option.value);
+      const next = isSelected ? prev.filter((v) => v !== option.value) : [...prev, option.value];
+      (onChange as (value: T[]) => void)(next);
+    } else {
+      (onChange as (value: T | null) => void)(option.value);
+      setIsOpen(false);
+    }
     setSource('');
+  };
+
+  const handleRemove = (option: OptionType<T>, event: MouseEvent) => {
+    event.stopPropagation();
+    if (!isMulti) return;
+
+    const prev = value as T[];
+    const next = prev.filter((v) => v !== option.value);
+    (onChange as (value: T[]) => void)(next);
   };
 
   const handleClear = (event: MouseEvent) => {
     event.stopPropagation();
-
-    onChange?.(null);
-    setIsOpen(false);
+    if (isMulti) {
+      (onChange as (value: T[]) => void)([]);
+    } else {
+      (onChange as (value: T | null) => void)(null);
+    }
     setSource('');
-    setSelectedOption(null);
+    setIsOpen(false);
   };
 
   const handleToggleDropdown = () => {
     if (disabled) return;
-
     if (isOpen) {
       setIsOpen(false);
     } else {
@@ -113,29 +147,55 @@ const Select = (props: SelectProps) => {
         <div className={`${selectInputContainer} ${customClassName?.inputContainer || ''}`}>
           <div className={`${selectPlaceholderContainer} ${customClassName?.placeholderContainer || ''}`}>
             <div
-              className={`${selectPlaceholder({ isLabel: !isEmpty(selectedOption?.label) })} ${customClassName?.placeholder || ''}`}
+              className={`${selectPlaceholder({ isLabel: selectedList.length > 0 })} ${customClassName?.placeholder || ''}`}
             >
-              {!source && (selectedOption?.label || placeholder || 'Select...')}
+              {!source &&
+                (selectedList.length === 0 ? placeholder || 'Select...' : isMulti ? '' : selectedList[0]?.label)}
             </div>
           </div>
 
-          <input
-            className={`${selectInput} ${customClassName?.input || ''}`}
-            ref={selectRef}
-            value={source}
-            onFocus={handleInputFocus}
-            onChange={(event) => handleInputChange(event.target.value)}
-            onClick={handleInputClick}
-            disabled={disabled}
-            readOnly={!isSearchable}
-          />
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', alignItems: 'center' }}>
+            {isMulti &&
+              selectedList.map((option) => (
+                <div
+                  key={option.value}
+                  className={customClassName?.selectedTag || ''}
+                  style={{
+                    padding: '2px 8px',
+                    background: '#EEF0F4',
+                    borderRadius: '4px',
+                    fontSize: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                  }}
+                >
+                  {option.label}
+                  <span style={{ cursor: 'pointer' }} onClick={(e) => handleRemove(option, e)}>
+                    ×
+                  </span>
+                </div>
+              ))}
+
+            <input
+              className={`${selectInput} ${customClassName?.input || ''}`}
+              ref={selectRef}
+              value={source}
+              onFocus={handleInputFocus}
+              onChange={(event) => handleInputChange(event.target.value)}
+              onClick={handleInputClick}
+              disabled={disabled}
+              readOnly={!isSearchable}
+              style={{ flex: 1, minWidth: '40px' }}
+            />
+          </div>
         </div>
 
         <div
           style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
           className={customClassName?.iconWrapper || ''}
         >
-          {isClearable && value && !disabled && (
+          {isClearable && selectedList.length > 0 && !disabled && (
             <ClearIcon width={20} height={20} stroke={'#5C7099'} style={{ cursor: 'pointer' }} onClick={handleClear} />
           )}
           {isSearchable ? (
@@ -154,18 +214,22 @@ const Select = (props: SelectProps) => {
             maxHeight: maxHeight,
           }}
         >
-          {optionList.length === 0 ? (
+          {filteredOptionList.length === 0 ? (
             <div className={`${selectOption} ${customClassName?.option || ''}`}>No Data</div>
           ) : (
-            filteredOptionList.map((option) => (
-              <div
-                key={option.value}
-                className={`${selectOption} ${customClassName?.option || ''}`}
-                onClick={() => handleOptionClick(option)}
-              >
-                {option.label}
-              </div>
-            ))
+            (filteredOptionList as OptionType<T>[]).map((option) => {
+              const isSelected = selectedValues.some((v) => v === option.value);
+              return (
+                <div
+                  key={option.value}
+                  className={`${selectOption} ${customClassName?.option || ''}`}
+                  onClick={() => handleOptionClick(option)}
+                >
+                  {isMulti && <input type="checkbox" readOnly checked={isSelected} style={{ marginRight: '8px' }} />}
+                  {option.label}
+                </div>
+              );
+            })
           )}
         </div>
       )}
