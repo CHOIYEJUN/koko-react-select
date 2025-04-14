@@ -1,0 +1,19 @@
+{
+  "name": "koko-react-select",
+  "version": "1.0.0",
+  "main": "component/Select.js",
+  "types": "component/Select.d.ts",
+  "exports": {
+    ".": {
+      "import": "./component/Select.js",
+      "types": "./component/Select.d.ts"
+    }
+  },
+  "files": [
+    "component"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "description": "A custom Select component with multi-select, search, and clear features",
+  "keywords": ["react", "select", "dropdown", "multi-select", "typescript"]
+}
