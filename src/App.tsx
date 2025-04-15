@@ -2,7 +2,7 @@ import Select from './component/Select.tsx';
 import { useState } from 'react';
 
 function App() {
-  const [value, setValue] = useState<string | number>('');
+  const [value, setValue] = useState<(string | number)[]>([]);
   const [value2, setValue2] = useState<string | number>('');
   const optionList = [
     { label: '셀트리온', value: '1' },
@@ -28,12 +28,13 @@ function App() {
     <div style={{ display: 'flex', flexDirection: 'row' }}>
       <Select
         value={value}
-        onChange={(value) => setValue(value || '')}
+        onChange={(value) => setValue(value)}
         placeholder={'...select'}
         optionList={optionBList}
         isClearable={true}
         isSearchable={true}
         disabled={false}
+        isMulti={true}
       />
 
       <Select
@@ -41,7 +42,6 @@ function App() {
         onChange={(value) => setValue2(value || '')}
         placeholder={'...select'}
         optionList={optionList}
-        isClearable={true}
       />
     </div>
   );

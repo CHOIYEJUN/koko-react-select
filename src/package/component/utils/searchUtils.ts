@@ -1,5 +1,5 @@
-import { CHOSUNG_LIST } from '../data/constants';
-import { OptionType } from '../type/commonType';
+import { CHOSUNG_LIST } from '../data/constants.ts';
+import { OptionType } from '../type/commonType.ts';
 
 export const filterOptions = <T extends string | number>(
   options: OptionType<T>[],
