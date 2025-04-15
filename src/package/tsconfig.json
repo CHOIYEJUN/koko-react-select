@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "jsx": "react-jsx",
+    "lib": ["DOM", "ES2020", "DOM.Iterable"],
+    "types": ["vite/client", "react"],
+    "module": "ESNext",
+    "target": "ES2020",
+    "moduleResolution": "node",
+    "rootDir": "./component",
+    "outDir": "./dist",
+    "allowImportingTsExtensions": true
+  },
+  "include": ["component", "../vite-env.d.ts"]
+}
