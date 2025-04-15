@@ -34,7 +34,7 @@ export const selectContainer = recipe({
     },
     invalid: {
       true: {
-        border: `1px solid ${vars.color.danger}`,
+        border: `2px solid ${vars.color.danger}`,
       },
       false: {},
     },

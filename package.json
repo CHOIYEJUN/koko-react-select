@@ -18,7 +18,8 @@
     "@vanilla-extract/vite-plugin": "^5.0.1",
     "clsx": "^2.1.1",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "vite-svg-loader": "^5.0.0"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^3.2.6",
@@ -30,7 +31,7 @@
     "@storybook/react": "^8.6.11",
     "@storybook/react-vite": "^8.6.11",
     "@storybook/test": "^8.6.11",
-    "@types/react": "^19.0.10",
+    "@types/react": "^19.1.2",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
     "@vitest/browser": "^3.1.1",
