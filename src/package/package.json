@@ -1,16 +1,16 @@
 {
   "name": "koko-react-select",
   "version": "1.0.0",
-  "main": "component/Select.js",
-  "types": "component/Select.d.ts",
+  "main": "dist/component/Select.js",
+  "types": "dist/component/Select.d.ts",
   "exports": {
     ".": {
-      "import": "./component/Select.js",
-      "types": "./component/Select.d.ts"
+      "import": "./dist/component/Select.js",
+      "types": "./dist/component/Select.d.ts"
     }
   },
   "files": [
-    "component"
+    "dist"
   ],
   "author": "Your Name",
   "license": "MIT",

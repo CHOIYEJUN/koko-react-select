@@ -1,7 +1,8 @@
+import React = require('react');
 import ArrowIcon from '../assets/icon/icon_arrow.svg?react';
 import ClearIcon from '../assets/icon/icon_clear.svg?react';
 import SearchIcon from '../assets/icon/icon_search.svg?react';
-import useOutsideClick from './hooks/useOutsideClick.ts';
+import useOutsideClick from './hooks/useOutsideClick';
 import {
   selectContainer,
   selectInput,
@@ -10,9 +11,9 @@ import {
   selectOptionContainer,
   selectPlaceholder,
   selectPlaceholderContainer,
-} from './style/Select.css.ts';
-import { CustomClassName, OptionType } from './type/commonType.ts';
-import { filterOptions } from './utils/searchUtils.ts';
+} from './style/Select.css';
+import { CustomClassName, OptionType } from './type/commonType';
+import { filterOptions } from './utils/searchUtils';
 import { useRef, useState, MouseEvent, useMemo, RefObject } from 'react';
 
 type CommonSelectProps<T extends string | number> = {
