@@ -1,5 +1,7 @@
-import Select from './component/Select.tsx';
+
 import { useState } from 'react';
+import Select from "koko-react-select";
+import 'koko-react-select/dist/koko-react-select.css';
 
 function App() {
   const [value, setValue] = useState<(string | number)[]>([]);

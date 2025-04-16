@@ -4,9 +4,20 @@ import path from 'node:path';
 import { defineConfig } from 'vite';
 import svgr from 'vite-plugin-svgr';
 
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), svgr(), vanillaExtractPlugin()],
+  plugins: [
+      react(),
+      svgr({
+      svgrOptions: {
+        exportType: 'default',
+        icon: true,
+      },
+        include: '**/*.svg'
+    }),
+    vanillaExtractPlugin({
+      identifiers: 'short',
+    }),
+  ],
   build: {
     lib: {
       entry: path.resolve(__dirname, 'src/package/component/Select.tsx'),

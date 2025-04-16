@@ -1,7 +1,7 @@
-import React = require('react');
-import ArrowIcon from '../assets/icon/icon_arrow.svg?react';
-import ClearIcon from '../assets/icon/icon_clear.svg?react';
-import SearchIcon from '../assets/icon/icon_search.svg?react';
+
+import ArrowIcon from '../../assets/icon/icon_arrow.svg';
+import ClearIcon from '../../assets/icon/icon_clear.svg';
+import SearchIcon from '../../assets/icon/icon_search.svg';
 import useOutsideClick from './hooks/useOutsideClick';
 import {
   selectContainer,
