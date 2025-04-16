@@ -12,8 +12,19 @@
   "files": [
     "dist"
   ],
-  "author": "Your Name",
+  "author": "choiyejun",
   "license": "MIT",
-  "description": "A custom Select component with multi-select, search, and clear features",
-  "keywords": ["react", "select", "dropdown", "multi-select", "typescript"]
+  "description": "한국어 초성, 부분 검색을 지원하는 커스텀 React Select 컴포넌트입니다. 멀티 선택, 검색, 초기화 기능을 포함합니다.",
+  "keywords": [
+    "react",
+    "select",
+    "dropdown",
+    "multi-select",
+    "typescript",
+    "초성검색",
+    "한국어검색",
+    "한국어 셀렉트",
+    "react 셀렉트",
+    "react 초성검색"
+  ]
 }

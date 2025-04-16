@@ -1,4 +1,4 @@
-import { vars } from './SelectTheme.css.ts';
+import { vars } from './SelectTheme.css';
 import { style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 
